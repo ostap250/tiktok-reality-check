@@ -49,19 +49,6 @@ Your data stays local. The app processes your JSON file entirely in your browser
 
 ---
 
-## 📸 Screenshots
-
-![Dashboard Screenshot](screenshots/dashboard.png)
-*Main dashboard showing stats, persona, and absurd comparisons*
-
-![Upload Screen Screenshot](screenshots/upload.png)
-*Clean upload interface*
-
-![Persona Card Screenshot](screenshots/persona.png)
-*Persona detection with glassmorphic card design*
-
----
-
 ## 🚀 Installation & Run
 
 ### Prerequisites
