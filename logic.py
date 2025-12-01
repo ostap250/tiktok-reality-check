@@ -331,45 +331,37 @@ def get_absurd_items(total_hours):
         noodle_count = int(total_hours / 0.05)
         items.append({'icon': '🍜', 'text': f'Cook {noodle_count:,} packs of instant noodles'})
     
-    # Pet dog (5 minutes = 0.083 hours)
-    if total_hours >= 0.083:
-        pet_count = int(total_hours / 0.083)
-        items.append({'icon': '🐶', 'text': f'Pet a dog {pet_count:,} times'})
+    # Blinks (average 1200 blinks per hour)
+    if total_hours >= 0.00083:  # At least 3 seconds
+        blink_count = int(total_hours * 1200)
+        items.append({'icon': '👁️', 'text': f'Blink {blink_count:,} times'})
     
-    # Become President of Argentina (4 year term = ~35,000 hours)
-    if total_hours >= 35000:
-        pres_count = int(total_hours / 35000)
-        items.append({'icon': '🇦🇷', 'text': f'Become President of Argentina {pres_count} times'})
+    # Climb Mt. Everest (approx 60 hours to summit from base camp)
+    if total_hours >= 60:
+        everest_count = int(total_hours / 60)
+        items.append({'icon': '⛰️', 'text': f'Climb Mt. Everest {everest_count} times'})
     
-    # Walk to the Moon (~76,880 hours round trip)
-    if total_hours >= 76880:
-        items.append({'icon': '🌙', 'text': 'Walk to the Moon and back'})
-    elif total_hours >= 38440:
-        items.append({'icon': '🌙', 'text': 'Walk to the Moon (one way)'})
+    # Watch Titanic (3 hours 14 minutes = 3.233 hours)
+    if total_hours >= 3.233:
+        titanic_count = int(total_hours / 3.233)
+        items.append({'icon': '🚢', 'text': f'Watch "Titanic" {titanic_count} times'})
     
-    # Additional items
-    if total_hours >= 1000:
-        one_piece_count = int(total_hours / 1000)
-        items.append({'icon': '🏴‍☠️', 'text': f'Watch the entire One Piece anime {one_piece_count} times'})
+    # Walk from London to Paris (approx 90 hours walking)
+    if total_hours >= 90:
+        walk_count = int(total_hours / 90)
+        items.append({'icon': '🚶', 'text': f'Walk from London to Paris {walk_count} times'})
     
-    if total_hours >= 10000:
-        govt_count = int(total_hours / 10000)
-        items.append({'icon': '⚔️', 'text': f'Overthrow a government {govt_count} times'})
+    # Heartbeats (average 80 bpm = 4800 beats per hour)
+    if total_hours >= 0.00021:  # At least 0.75 seconds
+        heartbeat_count = int(total_hours * 4800)
+        items.append({'icon': '❤️', 'text': f'Your heart beat {heartbeat_count:,} times'})
     
-    if total_hours >= 1000:
-        lang_count = int(total_hours / 1000)
-        items.append({'icon': '🗣️', 'text': f'Learn {lang_count} languages to fluency'})
-    
-    if total_hours >= 50:
-        book_count = int(total_hours / 50)
-        items.append({'icon': '📚', 'text': f'Read War and Peace {book_count} times'})
-    
-    if total_hours >= 100:
-        marathon_count = int(total_hours / 100)
-        items.append({'icon': '🏃', 'text': f'Train for and run {marathon_count} marathons'})
-    
-    if total_hours >= 2000:
-        house_count = int(total_hours / 2000)
-        items.append({'icon': '🏠', 'text': f'Build {house_count} houses from scratch'})
+    # Thumb scroll (1 hour scrolling = 300 meters of thumb travel)
+    if total_hours >= 0.0033:  # At least 12 seconds
+        scroll_meters = int(total_hours * 300)
+        burj_height = 828  # Burj Khalifa height in meters
+        burj_count = int(scroll_meters / burj_height)
+        if burj_count > 0:
+            items.append({'icon': '📱', 'text': f'Scroll the height of the Burj Khalifa {burj_count:,} times'})
     
     return items

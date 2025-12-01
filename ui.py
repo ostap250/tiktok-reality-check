@@ -102,7 +102,7 @@ def render_metrics(stats):
 
 def render_slider(items):
     """
-    Returns HTML string for the horizontal slider.
+    Returns HTML string for the auto-scrolling marquee slider.
     
     Args:
         items (list): List of dictionaries with icon and text keys
@@ -117,14 +117,21 @@ def render_slider(items):
         </div>
         """)
     
-    # Construct the .scroll-container HTML string
-    cards_html = ''
-    for item in items:
-        cards_html += f'<div class="scroll-card"><div class="icon">{item["icon"]}</div><div class="title">{item["text"]}</div></div>'
+    # Duplicate list to ensure seamless infinite scrolling loop
+    display_items = items * 2
     
+    # Construct HTML: Loop through items and build cards
+    # Each card has card-icon and card-text (no inline styles)
+    cards_html = ''
+    for item in display_items:
+        cards_html += f'<div class="scroll-card"><div class="card-icon">{item["icon"]}</div><div class="card-text">{item["text"]}</div></div>'
+    
+    # Wrap in scroll-container for auto-scrolling marquee
     return textwrap.dedent(f"""
-    <div class="scroll-container">
-        {cards_html}
+    <div class="card-marquee-wrapper">
+        <div class="card-marquee-track">
+            {cards_html}
+        </div>
     </div>
     """)
 

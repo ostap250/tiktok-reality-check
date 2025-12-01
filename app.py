@@ -42,9 +42,13 @@ if "persona" not in st.session_state:
 if "absurd_items" not in st.session_state:
     st.session_state.absurd_items = None
 
+if "last_calc_time" not in st.session_state:
+    st.session_state.last_calc_time = 0
+
 # 3. Sidebar: Settings
 st.sidebar.title("Settings")
-avg_duration = st.sidebar.slider("Average video duration (seconds)", min_value=10, max_value=60, value=30)
+avg_duration = st.sidebar.slider("Average video duration (seconds)", min_value=10, max_value=60, value=15)
+st.sidebar.caption("ℹ️ Note: The global average watch time is ~15s per video. Adjust if you are a fast scroller.")
 st.sidebar.checkbox("Dark Mode (Always On)", value=True, disabled=True)
 guilt_trip_mode = st.sidebar.checkbox("Enable 'Guilt Trip' Mode", value=True)
 
@@ -102,10 +106,26 @@ if not st.session_state.data_loaded:
 
 # 5. VIEW 2: Dashboard (if loaded)
 else:
-    # Get data from state
-    stats = st.session_state.stats
-    persona = st.session_state.persona
-    absurd_items = st.session_state.absurd_items
+    # Cooldown Logic: Throttle rapid recalculations
+    current_time = time.time()
+    time_since_last_calc = current_time - st.session_state.last_calc_time
+    
+    if time_since_last_calc < 1.0:
+        # Throttle: Wait for cooldown period
+        time.sleep(1.0 - time_since_last_calc)
+    
+    # Dynamic Updates: Recalculate stats with current avg_duration
+    # This ensures the slider changes trigger immediate updates
+    df = st.session_state.dataframe
+    stats = logic.calculate_stats(df, avg_duration)
+    persona = logic.get_persona(df, guilt_trip_mode)
+    absurd_items = logic.get_absurd_items(stats['total_hours'])
+    
+    # Update session state with new calculations
+    st.session_state.stats = stats
+    st.session_state.persona = persona
+    st.session_state.absurd_items = absurd_items
+    st.session_state.last_calc_time = time.time()
     
     # Call ui.render_metrics(stats)
     st.markdown(ui.render_metrics(stats), unsafe_allow_html=True)
@@ -114,9 +134,6 @@ else:
     # Call ui.render_slider(absurd_items)
     st.markdown("<h2>The Absurd Reality</h2>", unsafe_allow_html=True)
     st.markdown(ui.render_slider(absurd_items), unsafe_allow_html=True)
-    
-    # Inject JS: st.markdown(utils.inject_custom_js(), unsafe_allow_html=True)
-    st.markdown(utils.inject_custom_js(), unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
