@@ -7,13 +7,13 @@ import utils
 import logic
 import ui
 
-# Setup page config (must be first)
+# 1. Setup: Page config (Wide)
 st.set_page_config(page_title="TikTok Reality Check", layout="wide", initial_sidebar_state="expanded")
 
-# Load CSS and inject JS
-utils.load_css("styles.css")
+# Import modules and Load CSS
+utils.load_css()
 
-# Add custom scrollbar CSS directly in Python (sometimes external CSS scrollbars get ignored)
+# Add custom scrollbar CSS
 st.markdown("""
 <style>
 .scroll-container {
@@ -26,73 +26,105 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Session State
+# 2. State: Initialize session state
 if "data_loaded" not in st.session_state:
     st.session_state.data_loaded = False
 
 if "dataframe" not in st.session_state:
     st.session_state.dataframe = None
 
-# Sidebar settings
+if "stats" not in st.session_state:
+    st.session_state.stats = None
+
+if "persona" not in st.session_state:
+    st.session_state.persona = None
+
+if "absurd_items" not in st.session_state:
+    st.session_state.absurd_items = None
+
+# 3. Sidebar: Settings
 st.sidebar.title("Settings")
 avg_duration = st.sidebar.slider("Average video duration (seconds)", min_value=10, max_value=60, value=30)
 st.sidebar.checkbox("Dark Mode (Always On)", value=True, disabled=True)
 guilt_trip_mode = st.sidebar.checkbox("Enable 'Guilt Trip' Mode", value=True)
 
-# View 1: Upload
+# 4. VIEW 1: Landing Page (if not loaded)
 if not st.session_state.data_loaded:
-    # Show Title
-    st.markdown(ui.render_title(), unsafe_allow_html=True)
+    # Call ui.render_landing_header()
+    st.markdown(ui.render_landing_header(), unsafe_allow_html=True)
     
-    # File Uploader
+    # Call ui.render_landing_marquee()
+    st.markdown(ui.render_landing_marquee(), unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Show file uploader
     uploaded_file = st.file_uploader("Upload a JSON file", type=["json"])
     
-    # Process file if uploaded
+    # Info text
+    st.markdown(
+        "<p style='text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-top: 0.5rem;'>"
+        "Currently supports TikTok JSON. Instagram & YouTube coming soon."
+        "</p>",
+        unsafe_allow_html=True
+    )
+    
+    # Logic: On upload -> Spinner -> logic.process_json
     if uploaded_file is not None:
         # Spinner
         with st.spinner("🔍 Decoding digital footprint..."):
             time.sleep(1.5)
         
-        # Process JSON
-        df = logic.process_json(uploaded_file)
-        
-        if df is not None:
-            # Save State
+        try:
+            # Process JSON
+            df = logic.process_json(uploaded_file)
+            
+            # If success -> Calculate stats -> Save to State -> Rerun
+            stats = logic.calculate_stats(df, avg_duration)
+            persona = logic.get_persona(df, guilt_trip_mode)
+            absurd_items = logic.get_absurd_items(stats['total_hours'])
+            
+            # Save to State
             st.session_state.dataframe = df
+            st.session_state.stats = stats
+            st.session_state.persona = persona
+            st.session_state.absurd_items = absurd_items
             st.session_state.data_loaded = True
+            
+            # Rerun
             st.rerun()
-        else:
-            st.error("Could not find video history. Check JSON format. Expected path: ['Activity']['Video Browsing History']['VideoList']")
+        
+        except ValueError as e:
+            # If error -> Show st.error with the exception message
+            st.error(f"⚠️ {str(e)}")
+        except Exception as e:
+            st.error(f"⚠️ An unexpected error occurred: {str(e)}")
 
-# View 2: Dashboard
+# 5. VIEW 2: Dashboard (if loaded)
 else:
-    df = st.session_state.dataframe
+    # Get data from state
+    stats = st.session_state.stats
+    persona = st.session_state.persona
+    absurd_items = st.session_state.absurd_items
     
-    # Calculate stats
-    stats = logic.calculate_stats(df, avg_duration)
-    
-    # Render Header
-    st.markdown(ui.render_header(), unsafe_allow_html=True)
-    
-    # SECTION 1: Metrics
+    # Call ui.render_metrics(stats)
     st.markdown(ui.render_metrics(stats), unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # SECTION 2: Absurd Slider
+    # Call ui.render_slider(absurd_items)
     st.markdown("<h2>The Absurd Reality</h2>", unsafe_allow_html=True)
-    absurd_items = logic.get_absurd_items(stats['total_hours'])
-    slider_html = ui.render_slider(absurd_items)
-    # Inject JavaScript for dragging
-    slider_html += utils.DRAG_JS
-    st.markdown(slider_html, unsafe_allow_html=True)
+    st.markdown(ui.render_slider(absurd_items), unsafe_allow_html=True)
+    
+    # Inject JS: st.markdown(utils.inject_custom_js(), unsafe_allow_html=True)
+    st.markdown(utils.inject_custom_js(), unsafe_allow_html=True)
+    
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # SECTION 3: Persona
-    persona = logic.get_persona(df, guilt_trip_mode)
+    # Call ui.render_persona(persona)
     st.markdown(ui.render_persona(persona), unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # SECTION 4: Banner
+    # Call ui.render_banner()
     st.markdown(ui.render_banner(), unsafe_allow_html=True)
     
     # Button for waitlist
@@ -103,8 +135,11 @@ else:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Reset Button
+    # Button "Analyze another file" -> Reset state -> Rerun
     if st.button("Analyze another file", key="reset_button"):
         st.session_state.data_loaded = False
         st.session_state.dataframe = None
+        st.session_state.stats = None
+        st.session_state.persona = None
+        st.session_state.absurd_items = None
         st.rerun()
