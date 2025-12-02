@@ -34,6 +34,10 @@ venv.bak/
 *.json
 user_data.json
 
+# CRITICAL: Ignore ALL CSV files to protect collected emails (leads.csv)
+*.csv
+leads.csv
+
 # System Files
 .DS_Store
 .DS_Store?
@@ -88,6 +92,10 @@ cython_debug/
 .env
 .env.local
 .env.*.local
+
+# Streamlit Secrets (API keys, credentials)
+.streamlit/secrets.toml
+.streamlit/secrets/
 
 # Logs
 *.log
