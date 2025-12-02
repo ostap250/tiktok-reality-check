@@ -3,6 +3,8 @@
 import textwrap
 import streamlit as st
 import re
+import time
+import logic
 
 
 def render_gradient_text(text):
@@ -231,3 +233,60 @@ def render_title():
         </p>
     </div>
     """)
+
+
+def render_user_guide():
+    """
+    Renders the user guide expander with instructions for downloading TikTok data.
+    
+    Returns:
+        None (renders Streamlit component directly)
+    """
+    with st.expander("📘 How to download your TikTok JSON?", expanded=False):
+        st.markdown("""
+        1. Open TikTok App → Settings & Privacy.
+        
+        2. Tap **Account** → **Download your data**.
+        
+        3. Select **JSON** format (Critical step).
+        
+        4. Request data and wait for the download link.
+        
+        5. Upload the `user_data.json` file here.
+        """)
+
+
+@st.dialog("🚀 Join the Waitlist")
+def show_email_form():
+    """
+    Email collection form displayed in a dialog.
+    
+    Returns:
+        None (renders Streamlit dialog directly)
+    """
+    st.write("Be the first to get access to 'My Little Me'. Gamify your life.")
+    
+    email = st.text_input("Email address")
+    
+    if st.button("Join"):
+        if email:
+            success, msg = logic.save_lead(email)
+            if success:
+                st.success(msg)
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error(msg)
+        else:
+            st.error("Please enter your email address.")
+
+
+def render_cta_button():
+    """
+    Renders a call-to-action button that opens the email dialog.
+    
+    Returns:
+        None (renders Streamlit component directly)
+    """
+    if st.button("📩 Get Early Access", use_container_width=True):
+        show_email_form()

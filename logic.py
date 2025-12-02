@@ -3,6 +3,9 @@
 import json
 import pandas as pd
 import datetime
+import csv
+import os
+import re
 
 
 def _find_by_known_paths(data):
@@ -365,3 +368,48 @@ def get_absurd_items(total_hours):
             items.append({'icon': '📱', 'text': f'Scroll the height of the Burj Khalifa {burj_count:,} times'})
     
     return items
+
+
+def save_lead(email):
+    """
+    Save email lead to CSV file for lead magnet collection.
+    
+    Args:
+        email (str): Email address to save
+        
+    Returns:
+        tuple: (success: bool, message: str)
+            - (True, "Welcome to the club!") if successful
+            - (False, error_message) if validation fails or error occurs
+    """
+    # Validation: Check if email format is valid
+    email_pattern = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+    if not re.match(email_pattern, email):
+        return (False, "Invalid email format")
+    
+    try:
+        # File name
+        filename = 'leads.csv'
+        
+        # Check if file exists, if not create it with headers
+        file_exists = os.path.exists(filename)
+        
+        # Open file in append mode
+        with open(filename, 'a', newline='', encoding='utf-8') as csvfile:
+            fieldnames = ['timestamp', 'email']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            # Write headers if file is new
+            if not file_exists:
+                writer.writeheader()
+            
+            # Append the new email and current timestamp
+            writer.writerow({
+                'timestamp': datetime.datetime.now().isoformat(),
+                'email': email
+            })
+        
+        return (True, "Welcome to the club!")
+    
+    except Exception as e:
+        return (False, str(e))

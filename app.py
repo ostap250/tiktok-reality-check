@@ -54,18 +54,32 @@ guilt_trip_mode = st.sidebar.checkbox("Enable 'Guilt Trip' Mode", value=True)
 
 # 4. VIEW 1: Landing Page (if not loaded)
 if not st.session_state.data_loaded:
-    # Call ui.render_landing_header()
+    # 1. Header
     st.markdown(ui.render_landing_header(), unsafe_allow_html=True)
     
-    # Call ui.render_landing_marquee()
+    # 2. Marquee
     st.markdown(ui.render_landing_marquee(), unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Show file uploader
+    # 3. Uploader Section
     uploaded_file = st.file_uploader("Upload a JSON file", type=["json"])
     
-    # Info text
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # 4. User Guide
+    ui.render_user_guide()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # 5. Email CTA Button
+    col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
+    with col_cta2:
+        ui.render_cta_button()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # 6. Footer Note
     st.markdown(
         "<p style='text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-top: 0.5rem;'>"
         "Currently supports TikTok JSON. Instagram & YouTube coming soon."
